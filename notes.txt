@@ -1,0 +1,21 @@
+End-to-end Latency
+==================
+
+bin/kafka-run-class.sh \
+  kafka.tools.EndToEndLatency \
+  localhost:9092 \
+  localhost:2181 \
+  performance 5000
+
+
+bin/kafk-topics.sh \
+  --zookeeper localhost:2181 \
+  --create \
+  --topic test \
+  --partitions 6 \
+  --replication-factor 3
+
+bin/kafka-producer-perf-test.sh --topic test --num-records 50000000 --record-size 100 --throughput -1 --producer-props
+acks=1 bootstrap.servers=localhost:9092 buffer.memory=67108864 batch.size=8196
+
+bin/kafka-topics.sh --zookeeper localhost:2181 --delete --topic performance

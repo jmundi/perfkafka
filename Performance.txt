@@ -1,0 +1,33 @@
+Metrics
+=======
+
+PRODUCER PERFORMANCE
+--------------------
+
+
+Number of Records (Constant): 1,000,000,000
+
+Record Size (Variable):
+
+Acknowedgment Level (Variable):
+https://docs.confluent.io/platform/current/installation/configuration/producer-configs.html#acks
+
+Buffer Memory (Variable) (bytes):
+https://docs.confluent.io/platform/current/installation/configuration/producer-configs.html#buffer.memory
+
+Batch Size (Variable) (bytes): The maximum amount of data that can be sent in a single request.
+https://docs.confluent.io/platform/current/installation/configuration/producer-configs.html#batch.size
+
+
+Records Sent
+Records Sent per Second (records/sec)
+Records Sent per Second (MB/sec)
+Average Latency (ms)
+Max Latency (ms)
+50th Latency (ms)
+95th Latency (ms)
+
+
+
+COSUMER PERFORMANCE
+-------------------
