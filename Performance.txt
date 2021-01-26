@@ -18,6 +18,14 @@ https://docs.confluent.io/platform/current/installation/configuration/producer-c
 Batch Size (Variable) (bytes): The maximum amount of data that can be sent in a single request.
 https://docs.confluent.io/platform/current/installation/configuration/producer-configs.html#batch.size
 
+The producer config property batch.size defaults to 16K bytes. This is used by the Producer to batch records.
+This setting enables fewer requests and allows multiple records to be sent to the same partition.
+Use this batch.size setting to improve IO throughput and performance on both producer and server (and consumer).
+Using a larger batch.size makes compression more efficient. If a record is larger than the batch size, it will not be batched.
+This setting allows the Producer to send requests containing multiple batches. The batches are per partition.
+The smaller the batch size the less the throughput and performance.
+If the batch size is too big and often gets sent before full, the memory allocated for the batch is wasted.
+
 
 Records Sent
 Records Sent per Second (records/sec)

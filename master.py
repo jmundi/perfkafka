@@ -7,11 +7,13 @@ DATA = []
 jvm = ''
 heap_space = ''
 ram = ''
+cpu = ''
+compression = ''
 topic = 'performance'
 replication_factor = 1                                  # replicas
-partitions = [2, 4, 8, 16]                              # 2, 4, 8, 16
-number_of_records = [1000, 10000, 100000, 1000000]      # 1 billion records
-record_size = [10, 100, 1000, 10000, 100000]            # in bytes 10, 100, 1000, 10000, 100000
+partitions = [4, 8, 16, 32]                              # 2, 4, 8, 16
+number_of_records = [100, 10000, 1000000]         # 1 million records
+record_size = [1000, 10000, 100000, 1000000]           # in bytes up to 1MB
 acks = [-1, 0, 1]                                       # -1   0   1
 buffer_memory = [16000000, 32000000, 64000000]          # in bytes 16MB, 32MB, 64MB,
 batch_size = [4000, 8000, 16000, 32000, 64000, 128000]  # in bytes 4000 (4KB), 8000, 16000, 32000, 64000, 128000
@@ -98,7 +100,7 @@ def run(i, a, b, c, d, e, f):
             payload['Partitions'] = a
             payload['Replication'] = replication_factor
             payload['Throughput records/sec'] = l[3]
-            payload['Throughput MB/sec'] = l[5]
+            payload['Throughput MB/sec'] = l[5].replace('(','')
             payload['Average Latency'] = l[7]
             payload['Max Latency'] = l[11]
             payload['50th Latency'] = l[15]
@@ -122,8 +124,7 @@ for a in partitions:
     --replication-factor {} --partitions {} --topic {}""".format(replication_factor, a, topic)
 
     create = shlex.split(create)
-    #print(create)
-    run_create(create)  # set up
+    run_create(create)  # set up topic
 
     for b in number_of_records:
         for c in record_size:
