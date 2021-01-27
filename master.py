@@ -11,21 +11,21 @@ cpu = ''
 compression = ''
 topic = 'performance'
 replication_factor = 1                                  # replicas
-partitions = [4, 8, 16, 32]                              # 2, 4, 8, 16
-number_of_records = [100, 10000, 1000000]         # 1 million records
-record_size = [1000, 10000, 100000, 1000000]           # in bytes up to 1MB
+partitions = [8, 16, 32]                                # 2, 4, 8, 16
+number_of_records = [1000000000]                           # 1 million records [100, 10000, 1000000]
+record_size = [1000, 5000, 10000]                       # in bytes up to 10KB
 acks = [-1, 0, 1]                                       # -1   0   1
-buffer_memory = [16000000, 32000000, 64000000]          # in bytes 16MB, 32MB, 64MB,
-batch_size = [4000, 8000, 16000, 32000, 64000, 128000]  # in bytes 4000 (4KB), 8000, 16000, 32000, 64000, 128000
+buffer_memory = [8000000, 16000000, 32000000]           # in bytes 16MB, 32MB, 64MB,
+batch_size = [16000, 32000, 64000]                      # in bytes 16000, 32000, 64000
 throughput = '-1'
 
-create_topic_command = """/Users/zion/kafka/bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor {} 
+create_topic_command = """/home/jackmundi/kafka/bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor {} 
 --partitions {} --topic {} """.format(replication_factor, partitions, topic)
 
-delete_topic_command = """/Users/zion/kafka/bin/kafka-topics.sh --zookeeper localhost:2181 --delete --topic {}""".format(
+delete_topic_command = """/home/jackmundi/kafka/bin/kafka-topics.sh --zookeeper localhost:2181 --delete --topic {}""".format(
     topic)
 
-producer_performance_command = """/Users/zion/kafka/bin/kafka-producer-perf-test.sh 
+producer_performance_command = """/home/jackmundi/kafka/bin/kafka-producer-perf-test.sh 
 --topic {} --num-records {} --record-size {} --throughput {} --producer-props 
 acks={} bootstrap.servers=localhost:9092 buffer.memory={} batch.size={}""" \
     .format(topic
@@ -36,11 +36,10 @@ acks={} bootstrap.servers=localhost:9092 buffer.memory={} batch.size={}""" \
             , buffer_memory
             , batch_size)
 
-# create_topic_command = shlex.split(create_topic_command)
+consumer_performance_command = ''
 delete_topic_command = shlex.split(delete_topic_command)
-# producer_performance_command = shlex.split(producer_performance_command)
 
-# print(producer_performance_command)
+end_to_end_performance_command = ''
 
 payload = {'Number of Records': '',
            'Record Size': '',
@@ -49,7 +48,9 @@ payload = {'Number of Records': '',
            'Batch Size': '',
            'Throughput': '',
            'Partitions': '',
-           'Replication': ''
+           'Replication': '',
+           'Brokers': '1',
+           'Memory' : '32GB'
            }
 
 
@@ -106,13 +107,15 @@ def run(i, a, b, c, d, e, f):
             payload['50th Latency'] = l[15]
             payload['95th Latency'] = l[18]
             payload['99th Latency'] = l[21]
+            payload['Brokers'] = '1'
+            payload['Memory'] = '32GB'
 
         except IndexError:
             pass
 
         DATA.append(payload)
         df = pd.DataFrame(DATA)
-        df.to_csv('df.csv', index=False, header=False, mode='a')
+        df.to_csv('df5.csv', index=False, header=False, mode='a')
 
         print(payload)
 
@@ -120,7 +123,7 @@ def run(i, a, b, c, d, e, f):
 
 
 for a in partitions:
-    create = """/Users/zion/kafka/bin/kafka-topics.sh --create --zookeeper localhost:2181 
+    create = """/home/jackmundi/kafka/bin/kafka-topics.sh --create --zookeeper localhost:2181 
     --replication-factor {} --partitions {} --topic {}""".format(replication_factor, a, topic)
 
     create = shlex.split(create)
@@ -131,7 +134,7 @@ for a in partitions:
             for d in acks:
                 for e in buffer_memory:
                     for f in batch_size:
-                        producer = """/Users/zion/kafka/bin/kafka-producer-perf-test.sh 
+                        producer = """/home/jackmundi/kafka/bin/kafka-producer-perf-test.sh 
                         --topic {} --num-records {} --record-size {} --throughput {} --producer-props 
                         acks={} bootstrap.servers=localhost:9092 buffer.memory={} batch.size={}""" \
                             .format(topic
@@ -142,9 +145,9 @@ for a in partitions:
                                     , e
                                     , f)
                         producer = shlex.split(producer)
-                        #print('First batch: {}'.format(producer))
+                        #run_create(create)  # set up topic
                         producer = run(producer, a, b, c, d, e, f)
     run_delete(delete_topic_command)
 
 df = pd.DataFrame(DATA)
-df.to_csv('df.csv', index=False, header=True, mode='a')
+df.to_csv('df5.csv', index=False, header=True, mode='a')
